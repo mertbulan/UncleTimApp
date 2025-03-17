@@ -8,10 +8,11 @@
 import SwiftUI
 
 @main
-struct PingMeApp: App {
+struct UncleTimApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(Notifications())
         }
     }
 }
