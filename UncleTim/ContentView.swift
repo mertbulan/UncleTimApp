@@ -1,13 +1,12 @@
 //
 //  ContentView.swift
-//  PingMe
+//  UncleTim
 //
 //  Created by Mert Bulan on 06.12.24.
 //
 
 import SwiftUI
 import CloudKit
-import Combine
 
 struct ContentView: View {
     @EnvironmentObject var notifications: Notifications
@@ -18,17 +17,10 @@ struct ContentView: View {
         NavigationView {
             VStack(spacing: 20) {
                 if notifications.lists.isEmpty {
-                    Button("Request notification permission") {
+                    Button("Enable Notifications") {
                         requestNotificationPermissions()
                     }.buttonStyle(.borderedProminent)
-                    
-                    Button("Subscribe to notifications") {
-                        subscribeToNotifications()
-                    }.buttonStyle(.borderedProminent)
                 } else {
-                    if isLoading {
-                        ProgressView()
-                    }
                     List {
                         ForEach(notifications.lists) { notification in
                             VStack(alignment: .leading) {
@@ -51,8 +43,14 @@ struct ContentView: View {
                 if newPhase == .active {
                     isLoading = true
                     fetchNotifications()
-                    UIApplication.shared.applicationIconBadgeNumber = 0
-
+                    UNUserNotificationCenter.current().setBadgeCount(0)
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    if isLoading {
+                        ProgressView()
+                    }
                 }
             }
             .navigationTitle("Notifications")
@@ -81,6 +79,7 @@ func requestNotificationPermissions() {
             print("Notification permissions success!")
             DispatchQueue.main.async {
                 UIApplication.shared.registerForRemoteNotifications()
+                subscribeToNotifications()
             }
         } else {
             print("Notification permissions failure.")
@@ -115,5 +114,5 @@ func subscribeToNotifications() {
 }
 
 #Preview {
-    ContentView().environmentObject(NotificationsManager())
+    ContentView().environmentObject(Notifications())
 }
